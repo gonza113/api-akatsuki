@@ -2,7 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const multer = require("multer");
-const path = require("path")
+const path = require("path");
+const db = require ("./config/db");
+
+//Levantamos variables de entorno
+require("dotenv").config();
+console.log(process.env.DB_USER);
 
 //creamos nuestra api en express
 const api = express();
@@ -18,6 +23,15 @@ api.use(bodyParser.urlencoded({ extended: false}));
 api.use(bodyParser.json());
 
 
+api.get("/integrantes", async (request, response) => {
+    
+    const respuesta = await db.query("select * from integrantes");
+    const integ = respuesta.rows;  
+
+    response.send(integ);
+});
+
+
 //Un enpint para acceder a las imagenes de mi api (para un futuro que mi formulario pida imagenes)
 //api.get("/uploads/:filename", (request, response) => {
  //   const filename = request.patam.filename;
@@ -31,7 +45,6 @@ api.post("/integrantes-api", uploadMiddleware.single("foto"), function (request,
     const datos = request.body;
     const foto = request.file;
     console.log(datos, foto);
-    response.send({ message: "OK" });
 });
 
 //api.get("/integrantes-api", (req, res) => {
@@ -40,6 +53,6 @@ api.post("/integrantes-api", uploadMiddleware.single("foto"), function (request,
 //})
 
 //Elegir un puerto para mi api
-api.listen(3500, () => {
+api.listen(5432, () => {
     console.log("la api se levanto correctamente");
 });
