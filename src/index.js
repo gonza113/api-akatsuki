@@ -7,7 +7,7 @@ const db = require ("./config/db");
 
 //Levantamos variables de entorno
 require("dotenv").config();
-console.log(process.env.DB_USER);
+
 
 //creamos nuestra api en express
 const api = express();
@@ -22,13 +22,21 @@ api.use(cors());
 api.use(bodyParser.urlencoded({ extended: false}));
 api.use(bodyParser.json());
 
-
+//CADA VEZ QUE ENTRO EN MI API, A "/integrantes" ME TIRA LA PAGINA ABAJO Y NO SUPE COMO ARREGLARLO.
 api.get("/integrantes", async (request, response) => {
     
     const respuesta = await db.query("select * from integrantes");
     const integ = respuesta.rows;  
 
     response.send(integ);
+
+    if (!respuesta) {
+        response.statusCode = 404;
+        response.send({
+            error: "Los integrantes no existen",
+        });
+        return;
+    }
 });
 
 
@@ -40,17 +48,14 @@ api.get("/integrantes", async (request, response) => {
 //   response.send("No tiene acceso a las imagenes")
 //});
 
-//definir una ruta a mi api
-api.post("/integrantes-api", uploadMiddleware.single("foto"), function (request, response) {
+//definir una ruta a mi api "NO SUPE COMO ENVIAR LA INFORMACION DEL FORMULARIO ENVIADO, A MI BD"
+api.post("/formularios", uploadMiddleware.single("foto"), function (request, response) {
     const datos = request.body;
     const foto = request.file;
     console.log(datos, foto);
 });
 
-//api.get("/integrantes-api", (req, res) => {
-//    const form = api.post;
- //   res.send(form);
-//})
+
 
 //Elegir un puerto para mi api
 api.listen(5432, () => {
